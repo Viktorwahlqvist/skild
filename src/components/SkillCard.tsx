@@ -20,10 +20,17 @@ const SkillCard = ({
 }: SkillRecord) => {
 	const [copied, setCopied] = useState(false);
 
-	const handleCopy = () => {
-		navigator.clipboard.writeText(installCommand);
-		setCopied(true);
-		setTimeout(() => setCopied(false), 2000); // Reset after 2 seconds
+	const handleCopy = async () => {
+		try {
+			if (!navigator.clipboard?.writeText) {
+				throw new Error("Clipboard API unavailable");
+			}
+			await navigator.clipboard.writeText(installCommand);
+			setCopied(true);
+			setTimeout(() => setCopied(false), 2000);
+		} catch (err) {
+			console.error("Failed to copy install command", err);
+		}
 	};
 	return (
 		<article className="skill-card">
@@ -49,7 +56,9 @@ const SkillCard = ({
 						<img src="/logo512.png" alt="author avatar" className="avatar" />
 						<div className="author-copy">
 							<p>Viktor</p>
-							<p>{new Date(createdAt as string).toLocaleDateString()}</p>
+							<p>
+								{createdAt ? new Date(createdAt).toLocaleDateString() : "—"}
+							</p>
 						</div>
 					</div>
 					<p className="category">{category}</p>
